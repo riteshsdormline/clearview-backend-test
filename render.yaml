@@ -4,3 +4,15 @@ services:
     runtime: docker
     plan: free
     healthCheckPath: /health
+
+  - type: web
+    name: clearview-frontend
+    runtime: node
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: BACKEND_URL
+        value: https://clearview-backend-test.onrender.com
