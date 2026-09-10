@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: clearview-backend
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
