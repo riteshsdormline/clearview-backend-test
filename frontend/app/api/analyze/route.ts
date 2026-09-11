@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 180;
 
-const BACKEND_URL = process.env.BACKEND_URL || "https://clearview-backend.onrender.com";
+const BACKEND_URL = process.env.BACKEND_URL || "https://clearview-backend-0uox.onrender.com";
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,12 +26,27 @@ export async function POST(request: NextRequest) {
       body: outgoingForm,
     });
 
-    const data = await backendResponse.json();
+    const responseText = await backendResponse.text();
+    let data: any = null;
+    if (responseText) {
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        data = null;
+      }
+    }
 
     if (!backendResponse.ok) {
       return NextResponse.json(
-        { error: data?.detail || "Backend processing failed" },
+        { error: data?.detail || `Backend processing failed (${backendResponse.status})` },
         { status: backendResponse.status }
+      );
+    }
+
+    if (!data) {
+      return NextResponse.json(
+        { error: "Backend returned an invalid response" },
+        { status: 502 }
       );
     }
 
