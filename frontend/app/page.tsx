@@ -59,9 +59,17 @@ export default function Home() {
       form.append("threshold", String(threshold));
       form.append("detector", detector);
       const response = await fetch("/api/analyze", { method: "POST", body: form });
-      const data = await response.json();
+      const responseText = await response.text();
+      let data: Partial<AnalyzeResponse> & { error?: string } = {};
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch {
+          throw new Error(`Analysis service returned an invalid response (${response.status})`);
+        }
+      }
       if (!response.ok) throw new Error(data?.error || "Analysis failed");
-      setResult(data);
+      setResult(data as AnalyzeResponse);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "Could not analyze image");
     } finally {
