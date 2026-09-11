@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 180;
 
-const BACKEND_URL = process.env.BACKEND_URL || "https://clearview-backend-test.onrender.com";
+const BACKEND_URL = process.env.BACKEND_URL || "https://clearview-backend.onrender.com";
 
 export async function POST(request: NextRequest) {
   try {
