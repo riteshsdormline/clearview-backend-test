@@ -145,7 +145,7 @@ def run(image_path, out_dir="outputs", model_dir="models",
     # Memory safety: Resize if image is extremely large to prevent OOM on
     # small server instances (e.g. Render free tier 512MB limit).
     h, w = image.shape[:2]
-    max_dim = 1600
+    max_dim = 1000
     if max(h, w) > max_dim:
         scale = max_dim / max(h, w)
         image = cv2.resize(image, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)

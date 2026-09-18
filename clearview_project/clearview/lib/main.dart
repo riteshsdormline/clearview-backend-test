@@ -37,8 +37,20 @@ class ClearviewApp extends StatelessWidget {
   );
 }
 
-class SplashGate extends StatelessWidget {
+class SplashGate extends StatefulWidget {
   const SplashGate({super.key});
+
+  @override
+  State<SplashGate> createState() => _SplashGateState();
+}
+
+class _SplashGateState extends State<SplashGate> {
+  @override
+  void initState() {
+    super.initState();
+    // Wake up the backend as soon as the app starts
+    AnalysisService().wakeUp();
+  }
 
   @override
   Widget build(BuildContext context) => StreamBuilder<User?>(

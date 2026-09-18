@@ -16,6 +16,7 @@ import os
 import shutil
 import tempfile
 import time
+import gc
 
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -99,6 +100,9 @@ async def analyze(
         with open(out_modified_path, "rb") as f:
             modified_img_b64 = base64.b64encode(f.read()).decode("utf-8")
         report = json.load(open(out_json_path))
+
+    # Force memory cleanup after processing
+    gc.collect()
 
     return JSONResponse({
         "report": report,

@@ -20,8 +20,6 @@ ENV MAX_UPLOAD_BYTES=10485760
 
 EXPOSE 7860
 
-# --workers 1 by default: this pipeline loads two DNN models per request
-# process and does CPU-bound OpenCV work, so scale via more container
-# instances (or a process manager) rather than many uvicorn workers sharing
-# one CPU allocation, unless you've sized the container generously.
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}"]
+# --workers 1 is mandatory for 512MB RAM to prevent loading multiple
+# instances of the AI model.
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860} --workers 1"]

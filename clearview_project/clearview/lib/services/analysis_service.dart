@@ -5,6 +5,16 @@ import 'package:http/http.dart' as http;
 import 'api_config.dart';
 
 class AnalysisService {
+  /// Pings the backend to wake it up if it's sleeping (Hugging Face Spaces).
+  Future<void> wakeUp() async {
+    try {
+      final url = ApiConfig.baseUrl;
+      await http.get(Uri.parse('$url/health')).timeout(const Duration(seconds: 5));
+    } catch (_) {
+      // Silently ignore wake-up failures
+    }
+  }
+
   Future<Map<String, dynamic>> analyze(
     File image, {
     double threshold = 0.65,
