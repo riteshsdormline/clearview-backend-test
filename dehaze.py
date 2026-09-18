@@ -53,19 +53,19 @@ def _transmission_estimate(img_float, atmosphere, patch_size=15, omega=0.95):
 def _guided_filter(guide_gray, src, radius=40, eps=1e-3):
     """Edge-aware smoothing of `src` guided by `guide_gray`, both float in
     [0,1]. Standard fast guided filter (He et al. 2010), box-filter based."""
-    mean_guide = cv2.boxFilter(guide_gray, cv2.CV_64F, (radius, radius))
-    mean_src = cv2.boxFilter(src, cv2.CV_64F, (radius, radius))
-    mean_guide_src = cv2.boxFilter(guide_gray * src, cv2.CV_64F, (radius, radius))
+    mean_guide = cv2.boxFilter(guide_gray, cv2.CV_32F, (radius, radius))
+    mean_src = cv2.boxFilter(src, cv2.CV_32F, (radius, radius))
+    mean_guide_src = cv2.boxFilter(guide_gray * src, cv2.CV_32F, (radius, radius))
     cov_guide_src = mean_guide_src - mean_guide * mean_src
 
-    mean_guide_sq = cv2.boxFilter(guide_gray * guide_gray, cv2.CV_64F, (radius, radius))
+    mean_guide_sq = cv2.boxFilter(guide_gray * guide_gray, cv2.CV_32F, (radius, radius))
     var_guide = mean_guide_sq - mean_guide * mean_guide
 
     a = cov_guide_src / (var_guide + eps)
     b = mean_src - a * mean_guide
 
-    mean_a = cv2.boxFilter(a, cv2.CV_64F, (radius, radius))
-    mean_b = cv2.boxFilter(b, cv2.CV_64F, (radius, radius))
+    mean_a = cv2.boxFilter(a, cv2.CV_32F, (radius, radius))
+    mean_b = cv2.boxFilter(b, cv2.CV_32F, (radius, radius))
 
     return mean_a * guide_gray + mean_b
 
@@ -78,13 +78,13 @@ def dehaze(image_bgr, patch_size=15, omega=0.95, t_min=0.15,
         over-correction on only-mildly-hazy photos (try 0.6-0.8 there).
     Returns: uint8 BGR dehazed image, same size.
     """
-    img_float = image_bgr.astype(np.float64) / 255.0
+    img_float = image_bgr.astype(np.float32) / 255.0
 
     dark = _dark_channel(img_float, patch_size)
     atmosphere = _atmospheric_light(img_float, dark)
     transmission = _transmission_estimate(img_float, atmosphere, patch_size, omega)
 
-    gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY).astype(np.float64) / 255.0
+    gray = cv2.cvtColor(image_bgr, cv2.COLOR_BGR2GRAY).astype(np.float32) / 255.0
     transmission_refined = _guided_filter(gray, transmission, guided_radius, guided_eps)
     transmission_refined = np.clip(transmission_refined, t_min, 1.0)
 
@@ -105,7 +105,7 @@ def estimate_haze_level(image_bgr, patch_size=15):
     outdoor images have dark channels near 0; hazy ones are much higher).
     Useful for deciding whether to bother dehazing at all, or how strongly.
     """
-    img_float = image_bgr.astype(np.float64) / 255.0
+    img_float = image_bgr.astype(np.float32) / 255.0
     dark = _dark_channel(img_float, patch_size)
     return float(np.mean(dark))
 

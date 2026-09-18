@@ -23,9 +23,14 @@ def enhance_image(image_bgr, denoise_strength=3, clahe_clip=2.0, sharpen_strengt
     out = image_bgr
 
     if denoise_strength > 0:
-        out = cv2.fastNlMeansDenoisingColored(
-            out, None, denoise_strength, denoise_strength, 7, 21
-        )
+        # Use a faster, lighter denoising for general clarity if the image
+        # is large, to avoid server timeouts. fastNlMeans is very slow.
+        if max(out.shape[:2]) > 800:
+            out = cv2.medianBlur(out, 3)
+        else:
+            out = cv2.fastNlMeansDenoisingColored(
+                out, None, denoise_strength, denoise_strength, 7, 21
+            )
 
     if clahe_clip > 0:
         lab = cv2.cvtColor(out, cv2.COLOR_BGR2LAB)

@@ -28,7 +28,6 @@ individually in the returned dict so you can inspect/retrain against them.
 """
 import cv2
 import numpy as np
-from skimage.feature import local_binary_pattern
 
 
 def _edge_density(gray):
@@ -67,13 +66,33 @@ def _block_contrast_variance(gray, blocks=4):
     return float(np.std(sharpness_vals) / mean_s)
 
 
-def _texture_irregularity(gray, radius=2, n_points=16):
-    lbp = local_binary_pattern(gray, n_points, radius, method="uniform")
-    hist, _ = np.histogram(lbp, bins=n_points + 2, range=(0, n_points + 2), density=True)
+def _texture_irregularity(gray):
+    """
+    Simpler, lighter texture entropy calculation using only NumPy.
+    Avoids the heavy scikit-image dependency to stay under 512MB RAM.
+    """
+    # Simple Local Binary Pattern implementation
+    h, w = gray.shape
+    lbp = np.zeros((h-2, w-2), dtype=np.uint8)
+    for i in range(1, h-1):
+        for j in range(1, w-1):
+            center = gray[i, j]
+            code = 0
+            code |= (gray[i-1, j-1] >= center) << 7
+            code |= (gray[i-1, j]   >= center) << 6
+            code |= (gray[i-1, j+1] >= center) << 5
+            code |= (gray[i,   j+1] >= center) << 4
+            code |= (gray[i+1, j+1] >= center) << 3
+            code |= (gray[i+1, j]   >= center) << 2
+            code |= (gray[i+1, j-1] >= center) << 1
+            code |= (gray[i,   j-1] >= center) << 0
+            lbp[i-1, j-1] = code
+
+    hist, _ = np.histogram(lbp, bins=256, range=(0, 256), density=True)
     hist = hist[hist > 0]
-    entropy = float(-np.sum(hist * np.log2(hist)))
-    max_entropy = np.log2(n_points + 2)
-    return entropy / max_entropy  # normalized 0-1
+    entropy = -np.sum(hist * np.log2(hist))
+    max_entropy = 8.0  # log2(256)
+    return float(entropy / max_entropy)
 
 
 def _local_color_variability(bgr, blocks=4):

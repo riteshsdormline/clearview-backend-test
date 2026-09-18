@@ -142,6 +142,14 @@ def run(image_path, out_dir="outputs", model_dir="models",
     if image is None:
         raise FileNotFoundError(f"Could not read image: {image_path}")
 
+    # Memory safety: Resize if image is extremely large to prevent OOM on
+    # small server instances (e.g. Render free tier 512MB limit).
+    h, w = image.shape[:2]
+    max_dim = 1600
+    if max(h, w) > max_dim:
+        scale = max_dim / max(h, w)
+        image = cv2.resize(image, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+
     # Dehaze first, before detection/scoring/identification -- everything
     # downstream works on the clearer image, not just the final display.
     # Auto-skipped on already-clear photos (haze level below threshold) so
