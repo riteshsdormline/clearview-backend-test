@@ -9,7 +9,6 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping HF Space
-        run: |
-          # Replace the URL below with your actual HF Space URL once created
-          curl -I https://clearview-backend.hf.space/health || echo "Space waking up..."
+      - - name: Ping HF Space
+      - run: |
+      - curl -I https://sarkarritesh2003-clearview-backend.hf.space/health || echo "Space waking up..."
