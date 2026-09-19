@@ -98,7 +98,7 @@ demo = gr.Interface(
 
 # 3. Mount Gradio into FastAPI
 # This keeps the API at the root and puts the UI at /
-app = gr.mount_fastapi(app, demo, path="/")
+app = gr.mount_gradio_app(app, demo, path="/")
 
 if __name__ == "__main__":
     import uvicorn
