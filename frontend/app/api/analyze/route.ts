@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 180;
 
-const BACKEND_URL = process.env.BACKEND_URL || "https://clearview-backend-0uox.onrender.com";
+const BACKEND_URL = process.env.BACKEND_URL || "https://sarkarritesh2003-clearview-backend.hf.space";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,6 +24,9 @@ export async function POST(request: NextRequest) {
     const backendResponse = await fetch(`${BACKEND_URL}/analyze`, {
       method: "POST",
       body: outgoingForm,
+      headers: {
+        "Accept": "application/json",
+      },
     });
 
     const responseText = await backendResponse.text();
