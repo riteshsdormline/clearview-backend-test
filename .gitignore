@@ -1,3 +1,4 @@
-yolov8n.pt
+# The API loads this weight file locally at startup; keep it in deployments.
+!yolov8n.pt
 sample images/
 clearview_project/

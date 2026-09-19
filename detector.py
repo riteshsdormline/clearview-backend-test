@@ -1,12 +1,15 @@
 """YOLOv8n object detection through the free Ultralytics package."""
+import os
+
 from ultralytics import YOLO
 
 
 class ObjectDetector:
     def __init__(self, model_dir="models", conf_threshold=0.35, model_name="yolov8n.pt"):
-        # Ultralytics downloads the small public weight file on first startup
-        # and caches it in the container. No API key or paid service is used.
-        self.model = YOLO(model_name)
+        model_path = os.path.join(model_dir, model_name)
+        if not os.path.isfile(model_path):
+            raise FileNotFoundError(f"Model weights not found: {model_path}")
+        self.model = YOLO(model_path)
         self.conf_threshold = conf_threshold
 
     def detect(self, image_bgr):

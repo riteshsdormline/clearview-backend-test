@@ -13,7 +13,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-ENV MODEL_DIR=models
+ENV MODEL_DIR=/app
 ENV PORT=7860
 ENV ALLOWED_ORIGINS=*
 ENV MAX_UPLOAD_BYTES=10485760
