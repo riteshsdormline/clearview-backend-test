@@ -7,9 +7,7 @@ from ultralytics import YOLO
 class ObjectDetector:
     def __init__(self, model_dir="models", conf_threshold=0.35, model_name="yolov8n.pt"):
         model_path = os.path.join(model_dir, model_name)
-        if not os.path.isfile(model_path):
-            raise FileNotFoundError(f"Model weights not found: {model_path}")
-        self.model = YOLO(model_path)
+        self.model = YOLO(model_path if os.path.isfile(model_path) else model_name)
         self.conf_threshold = conf_threshold
 
     def detect(self, image_bgr):
